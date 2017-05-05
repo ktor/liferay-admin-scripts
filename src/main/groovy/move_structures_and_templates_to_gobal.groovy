@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013 Sébastien Le Marchand, All rights reserved.
+ * Copyright (c) 2013 S?bastien Le Marchand, All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -11,46 +11,36 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
+ 
 //
-// refactor_template_ids.groovy
+// move_structures_and_templates_to_global.groovy
 //
-// Refactor some templates IDs
+// Move structures and templates from a site to the Global site
 //
 
 // Variables to update at your convenience
 
-groupId = 10190L // The site from getting templates
-
-includeGlobalTemplates = true
-
-map = [
-	'12807':'HEADER-TPL',
-	'14501':'PIECE-OF-NEWS-TPL', 
-	'15901':'FOOTER-TPL'
-	] 
+groupId = 10190L // The source site
 
 // Implementation
 
-import com.liferay.portal.kernel.dao.orm.*
 import com.liferay.portal.util.*
 import com.liferay.portlet.journal.model.*
 import com.liferay.portlet.journal.service.*
-	
+
 try {
 
-	map.each{ oldId, newId ->
-		t = JournalTemplateLocalServiceUtil.getTemplate(groupId, oldId, includeGlobalTemplates)
-		t.setTemplateId(newId)
+	companyGroupId = PortalUtil.getCompany(actionRequest).getGroup().getGroupId()
+
+	structures = JournalStructureLocalServiceUtil.getStructures(groupId)
+	structures.each{ s ->
+		s.setGroupId(companyGroupId)
+		JournalStructureLocalServiceUtil.updateJournalStructure(s)
+	}
+	templates = JournalTemplateLocalServiceUtil.getTemplates(groupId)
+	templates.each{ t ->
+		t.setGroupId(companyGroupId)
 		JournalTemplateLocalServiceUtil.updateJournalTemplate(t)
-		
-		q = DynamicQueryFactoryUtil.forClass(JournalArticle.class)
-		q.add(PropertyFactoryUtil.forName('templateId').eq(oldId))
-		articles = JournalArticleLocalServiceUtil.dynamicQuery(q)
-		articles.each{ a ->
-			a.setTemplateId(newId)
-			JournalArticleLocalServiceUtil.updateJournalArticle(a)
-		}
 	}
 
 } catch (e) {

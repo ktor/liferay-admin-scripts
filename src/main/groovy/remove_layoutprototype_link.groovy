@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013 Sébastien Le Marchand, All rights reserved.
+ * Copyright (c) 2013 Sï¿½bastien Le Marchand, All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,24 +23,23 @@
 groupId = 10190L // The site where removing LayoutPrototype links
 
 // Implementation
-
-import com.liferay.portal.kernel.util.*
-import com.liferay.portal.model.*
-import com.liferay.portal.service.*
-import com.liferay.portal.util.*
+import com.liferay.portal.kernel.util.StringPool
+import com.liferay.portal.kernel.util.Validator
+import com.liferay.portal.model.Layout
+import com.liferay.portal.service.LayoutLocalServiceUtil
 
 try {
-	layouts = new ArrayList<Layout>(2)
-	layouts.addAll(LayoutLocalServiceUtil.getLayouts(groupId, true))
-	layouts.addAll(LayoutLocalServiceUtil.getLayouts(groupId, false))
-	layouts.each{ l ->
-		if(l.getLayoutPrototypeLinkEnabled() 
-			|| Validator.isNotNull(l.getLayoutPrototypeUuid())) {
-			l.setLayoutPrototypeLinkEnabled(false)
-			l.setLayoutPrototypeUuid(StringPool.BLANK)
-			LayoutLocalServiceUtil.updateLayout(l)
-		}
-	}
+    layouts = new ArrayList<Layout>(2)
+    layouts.addAll(LayoutLocalServiceUtil.getLayouts(groupId, true))
+    layouts.addAll(LayoutLocalServiceUtil.getLayouts(groupId, false))
+    layouts.each { l ->
+        if (l.getLayoutPrototypeLinkEnabled()
+                || Validator.isNotNull(l.getLayoutPrototypeUuid())) {
+            l.setLayoutPrototypeLinkEnabled(false)
+            l.setLayoutPrototypeUuid(StringPool.BLANK)
+            LayoutLocalServiceUtil.updateLayout(l)
+        }
+    }
 } catch (e) {
-	e.printStackTrace(out)
+    e.printStackTrace(out)
 }
